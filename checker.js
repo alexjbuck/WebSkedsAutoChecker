@@ -1,7 +1,7 @@
 var page = require('webpage').create();
 var fs   = require('fs')
 
-var attempts = 0, timeout=500;
+var attempts = 0, timeout=5000;
 var address = 'http://www.cnatra.navy.mil/scheds/schedule_data.aspx?sq=vt-6';
 // var address = 'http://localhost:8888/';
 var d = new Date()
@@ -38,7 +38,17 @@ function onPageLoad(status) {
   }
 }
 
+// 5245 --> Julian Date 132 (May 12, 2014)
+// id = btnViewFP
+// id = btnViewSched
+// id = txtNameSearch
+// id = btnFilter
 
+/*  __doPostBack('ctrlCalendar',date);
+    document.form1.__EVENTTARGET.value='btnViewSched'
+    document.form1.__EVENTARGUMENT.value=''
+
+*/
 
 // ** Utility Functions **
 
