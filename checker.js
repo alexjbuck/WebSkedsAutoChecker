@@ -8,13 +8,14 @@ var d = new Date()
 
 page.onLoadFinished = onPageLoad;
 
-setInterval(function() {getSchedule()},1000);
+intervalVar = setInterval(function() {getSchedule()},1000);
 
 function onPageLoad(status) {
   if(status!=='success'){
 
     console.log('Unable to load the address!');
     // getSchedule();
+    
 
   } else {
 
@@ -29,6 +30,7 @@ function onPageLoad(status) {
       console.log('Loaded page did not have title! Attempting again.');
       // phantom.exit();
     } else {
+      clearInterval(intervalVar);
       fs.write('./dump.html',page.content,'w');
       // console.log(page.content);
       phantom.exit();
