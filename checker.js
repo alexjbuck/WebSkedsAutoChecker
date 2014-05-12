@@ -1,26 +1,28 @@
 var page = require('webpage').create();
 var fs   = require('fs')
 
-var attempts = 0;
+var attempts = 0, timeout=500;
 var address = 'http://www.cnatra.navy.mil/scheds/schedule_data.aspx?sq=vt-6';
 // var address = 'http://localhost:8888/';
 var d = new Date()
 
+page.onLoadStarted = function() {console.log('Attempting to load address. Attempt: ' + ++attempts);
+}
 page.onLoadFinished = onPageLoad;
 
-intervalVar = setInterval(function() {getSchedule()},1000);
+// intervalVar = setInterval(function() {getSchedule()},500);
+timer = setTimeout(getSchedule, timeout);
+
+function getSchedule() {
+  page.open(address);
+  timer = setTimeout(getSchedule, timeout);
+}
 
 function onPageLoad(status) {
   if(status!=='success'){
-
     console.log('Unable to load the address!');
-    // getSchedule();
-    
-
   } else {
-
     console.log('Successfully loaded the address!');
-    // page.render(makeDateTimeGroup(d) + '.png');
 
     var title = page.evaluate( function() {
       return document.title;
@@ -28,20 +30,14 @@ function onPageLoad(status) {
 
     if (title == '') {
       console.log('Loaded page did not have title! Attempting again.');
-      // phantom.exit();
     } else {
-      clearInterval(intervalVar);
+      clearInterval(timer);
       fs.write('./dump.html',page.content,'w');
-      // console.log(page.content);
       phantom.exit();
     }
   }
 }
 
-function getSchedule() {
-  console.log('Attempting to load address. Attempt: ' + ++attempts);
-  page.open(address);
-}
 
 
 // ** Utility Functions **
