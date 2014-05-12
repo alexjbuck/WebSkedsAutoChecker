@@ -8,7 +8,41 @@ var d = new Date()
 
 page.onLoadFinished = onPageLoad;
 
-setInterval(function() {getSchedule()},1);
+setInterval(function() {getSchedule()},1000);
+
+function onPageLoad(status) {
+  if(status!=='success'){
+
+    console.log('Unable to load the address!');
+    // getSchedule();
+
+  } else {
+
+    console.log('Successfully loaded the address!');
+    // page.render(makeDateTimeGroup(d) + '.png');
+
+    var title = page.evaluate( function() {
+      return document.title;
+    });
+
+    if (title == '') {
+      console.log('Loaded page did not have title! Attempting again.');
+      // phantom.exit();
+    } else {
+      fs.write('./dump.html',page.content,'w');
+      // console.log(page.content);
+      phantom.exit();
+    }
+  }
+}
+
+function getSchedule() {
+  console.log('Attempting to load address. Attempt: ' + ++attempts);
+  page.open(address);
+}
+
+
+// ** Utility Functions **
 
 function printDate(d) {
   console.log(makeDateTimeGroup(d));
@@ -28,35 +62,4 @@ function addZero(str) {
   } else if (str.length==1) {
     return '0'+str;
   }
-}
-
-function onPageLoad(status) {
-  if(status!=='success'){
-
-    console.log('Unable to load the address!');
-    // getSchedule();
-
-  } else {
-
-    console.log('Successfully loaded the address!');
-    // page.render(makeDateTimeGroup(d) + '.png');
-
-    var title = page.evaluate( function() {
-      return document.title;
-    });
-
-    if (title == '') {
-      console.log('Loaded page did not have title! Attempting again.');
-      phantom.exit();
-    } else {
-      fs.write('./dump.html',page.content,'w');
-      // console.log(page.content);
-      phantom.exit();
-    }
-  }
-}
-
-function getSchedule() {
-  console.log('Attempting to load address. Attempt: ' + ++attempts);
-  page.open(address);
 }
