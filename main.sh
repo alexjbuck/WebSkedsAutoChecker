@@ -20,3 +20,7 @@ curl -o $FPDIR'/$'$DATESTR'$'$SQUADRON'Frontpage.pdf' $URL
 
 echo '** Downloading Schedule.%n'
 phantomjs singleCheck.js $JULIAN $NAME
+
+echo '** Moving Files to Google Drive for Sharing'
+cp -R ./FrontPage '/Users/alexanderbuck/Google Drive/WebSchedule/'
+cp -R ./PNGs '/Users/alexanderbuck/Google Drive/WebSchedule/'
