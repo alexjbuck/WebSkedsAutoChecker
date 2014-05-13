@@ -38,18 +38,6 @@ function onPageLoad(status) {
   }
 }
 
-// 5245 --> Julian Date 132 (May 12, 2014)
-// id = btnViewFP
-// id = btnViewSched
-// id = txtNameSearch
-// id = btnFilter
-
-/*  __doPostBack('ctrlCalendar',date);
-    document.form1.__EVENTTARGET.value='btnViewSched'
-    document.form1.__EVENTARGUMENT.value=''
-
-*/
-
 // ** Utility Functions **
 
 function printDate(d) {

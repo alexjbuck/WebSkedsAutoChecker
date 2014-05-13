@@ -4,13 +4,43 @@
   1 - Failed to load the page
   2 - The service is unavailable
   3 - Bad date selected
+  4 - Bad arguments
 */
 
 var page = require('webpage').create();
 var fs = require("fs");
+var sys = require("system");
+var args = sys.args;
 
 var address = 'http://www.cnatra.navy.mil/scheds/schedule_data.aspx?sq=vt-6';
-var addressFP = 'http://www.cnatra.navy.mil/scheds/tw5/SQ-VT-6/$2014-05-13$VT-6$Frontpage.pdf'
+
+var loading = true;
+var loaded = false;
+var index = 0;
+var NAME='buck';
+var CALDATE='';
+var JDATE2CALDATE = 5113;
+var PNGDIR = './PNGs/';
+
+if (args.length>=4) {
+  console.log('phantomjs singleCheck.js (JDATE) (NAME)');
+  console.log('Usage Error.');
+  console.log('Too many arguments provided. 0, 1, or 2 arguments are required, the Julian Date of the requested day');
+  console.log('Shutting Down...');
+  phantom.exit(4);
+} else if (args.length<=1) {
+  console.log('No date provided... Using default date and name.');
+  NAME = 'buck';
+  // skip changing the date, use todays date as loaded on the page
+  index = 2;
+} else if (args.length==2) {
+  CALDATE = String(parseInt(args[1])+JDATE2CALDATE);
+  console.log('Looking up Schedule for default name on Julian Date: ' + args[1] + ' (CalDate: ' + CALDATE + ')');
+} else if (args.length==3) {
+  CALDATE = String(parseInt(args[1])+JDATE2CALDATE);
+  NAME=String(args[2]);
+  console.log('Looking up Schedule for "' + NAME + '" on Julian Date: ' + args[1] + ' (CalDate: ' + CALDATE + ')');
+};
 
 page.onLoadStarted = function() {
   loading = true;
@@ -19,10 +49,6 @@ page.onLoadStarted = function() {
 }
 page.onLoadFinished = onPageLoad;
 
-var loading = true;
-var loaded = false;
-var index = 0;
-var NAME = 'buck';
 page.open(address);
 
 setInterval(function () {
@@ -45,20 +71,20 @@ setInterval(function () {
 steps = [
   function() {
     console.log(' - Initial Render.');
-    page.render('page1.png');
+    page.render(PNGDIR + 'page1.png');
   },
   function() {
     console.log(' - Changing Date.');
-    page.evaluate( function() {
+    page.evaluate( function(CALDATE) {
       __doPostBack('ctrlCalendar','5246');
-    });
+    },CALDATE);
     // These flag changes are only here as a safeguard
     loading = true;
     loaded = false;
   },
   function() {
     console.log(' - Second Render.');
-    page.render('page2.png');
+    page.render(PNGDIR + 'page2.png');
   },
   function() {
     console.log(' - Loading Schedule.');
@@ -73,39 +99,24 @@ steps = [
   },
   function() {
     console.log(' - Third Render.');
-    page.render('page3.png');
+    page.render(PNGDIR + 'page3.png');
   },
   function() {
     console.log(' - Filtering by name.');
-    page.evaluate( function() {
-      document.getElementById('txtNameSearch').value = 'buck';
+    page.evaluate( function(NAME) {
+      document.getElementById('txtNameSearch').value = NAME;
       document.form1.__EVENTTARGET.value='btnFilter';
       document.form1.__EVENTARGUMENT.value='';
       document.form1.submit();
-    });
+    },NAME);
     // These flag changes are only here as a safeguard
     loading = true;
     loaded = false;
   },
   function() {
     console.log(' - Fourth Render.');
-    page.render('page4.png');
-  },
-  function() {
-    // console.log(' - Getting Front Page.');
-    // page.evaluate( function() {
-    //   document.form1.__EVENTTARGET.value='btnViewFP';
-    //   document.form1.__EVENTARGUMENT.value='';
-    //   document.form1.submit();
-    // });
-    page.open(addressFP)
-    // These flag changes are only here as a safeguard
-    loading = true;
-    loaded = false;
-  },
-  function() {
-    console.log(' - Fifth Render.');
-    page.render('page5.png');
+    page.render(PNGDIR + 'page4.png');
+    fs.write('./dump.html');
   }
 ]
 
