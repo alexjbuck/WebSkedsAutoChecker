@@ -30,6 +30,8 @@ FPDIR='./FrontPage'
 SQUADRON='VT-6'
 # Your filter name
 NAME='buck'
+# Your phone number for text notification that schedule has been recorded.
+PHONENUM=6302072555
 # How long to sleep between attempts
 SLEEPTIME=60
 # Flags to indicate if the current schedule and frontpage has been downloaded
@@ -63,8 +65,13 @@ while : ; do
     JULIAN=$(date -v+1d +%j)
     DATESTR=$(date -v+1d +%Y-%m-%d)
   fi
+  JULIAN=$(date +%j)
+  DATESTR=$(date +%Y-%m-%d)
+
   # Conversion: 5245 == Julian Date 132 (May 12th, 2014)
   CALDATE=JULIAN+5113
+
+
 
   if [ -f "$FPDIR/\$$DATESTR\$$SQUADRON\$Frontpage.pdf" ]
   then
@@ -82,6 +89,8 @@ while : ; do
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded front page."
+       curl http://textbelt.com/text -d number=$PHONENUM -d message=\
+       "Front page for $DATESTR now on Google Drive."
     else
        echo "xx"
        echo "xx Failed to download front page."
@@ -103,7 +112,9 @@ while : ; do
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded schedule."
-       echo '++ Copying files to google drive for sharing.'
+       echo '++ Copying files to google drive for sharing and sending SMS notification.'
+       curl http://textbelt.com/text -d number=$PHONENUM -d message=\
+       "Schedule for $DATESTR now on Google Drive."
        cp -R ./FrontPage '/Users/alexanderbuck/Google Drive/WebSchedule/'
        cp -R ./PNGs '/Users/alexanderbuck/Google Drive/WebSchedule/'
     else
