@@ -1,3 +1,7 @@
+### DEPRECATED
+console.log('This script is deprecated. do not use it');
+phantom.exit();
+
 var page = require('webpage').create();
 var fs   = require('fs')
 
