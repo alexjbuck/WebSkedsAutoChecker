@@ -24,25 +24,32 @@ else
 fi
 
 
-FPDIR='./FrontPage'
-
+## USER OPTIONS ##
+##################
 # Your Squadron
 SQUADRON='VT-6'
 # Your filter name
 NAME='buck'
 # Your phone number for text notification that schedule has been recorded.
 PHONENUM=6302072555
+# Location of your Google Drive directory
+GOOGLEDRIVEDIR='/Users/alexanderbuck/Google Drive/WebSchedule/'
 # How long to sleep between attempts
 SLEEPTIME=60
-# Flags to indicate if the current schedule and frontpage has been downloaded
-GOTSKED=false
-GOTFP=false
 # Keep looking for the next day schedule up until this hour on that day
 POLLUNTIL=8
 # Switch to lower frequency polling at this hour
 POLLSTOP=8
 # Switch back to higher frequency polling at this hour
 POLLSTART=14
+
+
+# Flags to indicate if the current schedule and frontpage has been downloaded
+GOTSKED=false
+GOTFP=false
+# Name of FrontPage directory
+FPDIR='./FrontPage'
+
 
 declare -i JULIAN
 declare -i CALDATE
@@ -115,8 +122,8 @@ while : ; do
        echo '++ Copying files to google drive for sharing and sending SMS notification.'
        curl http://textbelt.com/text -d number=$PHONENUM -d message=\
        "Schedule for $DATESTR now on Google Drive."
-       cp -R ./FrontPage '/Users/alexanderbuck/Google Drive/WebSchedule/'
-       cp -R ./PNGs '/Users/alexanderbuck/Google Drive/WebSchedule/'
+       cp -R ./FrontPage $GOOGLEDRIVEDIR
+       cp -R ./PNGs $GOOGLEDRIVEDIR
     else
        echo "xx"
        echo "xx Failed to download schedule."
