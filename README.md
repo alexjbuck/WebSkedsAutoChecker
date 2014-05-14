@@ -15,12 +15,14 @@ You must have the **PhantomJS** executable, ```phantomjs``` installed onto your 
 ### User Options
 You determine which squadron to check and which name to filter for in the beginning of the _main.sh_ script.
 ```
+...
 # Your Squadron
 SQUADRON='VT-6'
 # Your filter name
 NAME='buck'
 # How long to sleep between attempts
 SLEEPTIME=20
+...
 ```
 
 ## Future implementation
