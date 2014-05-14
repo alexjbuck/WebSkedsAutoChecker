@@ -127,8 +127,8 @@ page.onConsoleMessage = function(msg, lineNum, sourceId) {
 function onPageLoad(status) {
   loading = false;
   loaded = false;
-  console.log('');
-  console.log(page.content);
+  // console.log('');
+  // console.log(page.content);
   if(status=='success') {
     var title = page.evaluate(function() {return document.title;});
     console.log('Page Loaded, title: ' + title);
