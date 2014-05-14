@@ -11,7 +11,7 @@ SQUADRON='VT-6'
 # Your filter name
 NAME='buck'
 # How long to sleep between attempts
-SLEEPTIME=20
+SLEEPTIME=60
 
 declare -i JULIAN
 declare -i CALDATE
@@ -31,8 +31,15 @@ while : ; do
     echo '**'
     echo '** Downloading the front page.'
     echo '**'
-    URL='http://www.cnatra.navy.mil/scheds/tw5/SQ-VT-6/$'$DATESTR'$'$SQUADRON'Frontpage.pdf'
-    curl -o $FPDIR'/$'$DATESTR'$'$SQUADRON'Frontpage.pdf' $URL
+    if [ -e $FPDIR ]; then
+      echo
+    else
+      echo '** FrontPage director did not exist... Creating it now.'
+      mkdir $FPDIR
+    fi
+
+    URL=http://www.cnatra.navy.mil/scheds/tw5/SQ-VT-6/\$$DATESTR\$$SQUADRON\$Frontpage.pdf
+    curl -o $FPDIR/\$$DATESTR\$$SQUADRON\$Frontpage.pdf $URL
     OUT=$?
     if [ $OUT -eq 0 ];then
        echo "++ Successfully downloaded front page."
@@ -44,7 +51,7 @@ while : ; do
   fi
 
 
-  if [  -f "./PNGs/page3_$CALDATE.png"  -a  -f "./PNGs/page4_$CALDATE.png" ]; then
+  if [  -f ./PNGs/$CALDATE\page3.png  -a  -f ./PNGs/$CALDATE\page4.png ]; then
     echo "++ Schedule already downloaded."
   else
     echo '**'
