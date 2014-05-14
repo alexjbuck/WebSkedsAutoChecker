@@ -4,6 +4,26 @@ echo '************ WebSkedsAutoChecker ************'
 echo '*             by Alexander Buck             *'
 echo '*********************************************'
 
+if [ `which phantomjs` ]; then
+  echo
+else
+  echo "I cannot find phantomjs on your path."
+  echo "Please download and/or install it first."
+  echo "Exiting..."
+  echo
+  exit 1
+fi
+if [ `which curl` ]; then
+  echo
+else
+  echo "I cannot find cURL on your path."
+  echo "Please download and/or install it first."
+  echo "Exiting..."
+  echo
+  exit 2
+fi
+
+
 FPDIR='./FrontPage'
 
 # Your Squadron
