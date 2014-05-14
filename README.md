@@ -1,7 +1,7 @@
 WebSkedsAutoChecker
 ===================
 
-This project aims to create a javascript program that runs via PhantomJS (http://phantomjs.org/) to check if the CNATRA Web Schedule (http://www.cnatra.navy.mil/scheds/) is posted and grab a copy if it is.
+This project aims to create a *JavaScript* program that runs via PhantomJS (http://phantomjs.org/) to check if the CNATRA Web Schedule (http://www.cnatra.navy.mil/scheds/) is posted and grab a copy if it is.
 
 The uptime of the CNATRA website is very poor so this creates a local copy anytime it is found to be up.
 
