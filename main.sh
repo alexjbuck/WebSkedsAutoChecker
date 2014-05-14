@@ -6,13 +6,17 @@ echo '*********************************************'
 
 FPDIR='./FrontPage'
 
+# Your Squadron
 SQUADRON='VT-6'
+# Your filter name
 NAME='buck'
+# How long to sleep between attempts
 SLEEPTIME=20
+
 declare -i JULIAN
 declare -i CALDATE
 
-
+# Begin polling loop
 while : ; do
 
   JULIAN=$(date -v+1d +%j)
