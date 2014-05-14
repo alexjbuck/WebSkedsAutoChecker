@@ -71,12 +71,12 @@ setInterval(function () {
 steps = [
   function() {
     console.log(' - Initial Render.');
-    page.render(PNGDIR + 'page1.png');
+    page.render(PNGDIR + CALDATE +'page1.png');
   },
   function() {
     console.log(' - Changing Date.');
     page.evaluate( function(CALDATE) {
-      __doPostBack('ctrlCalendar','5246');
+      __doPostBack('ctrlCalendar',CALDATE);
     },CALDATE);
     // These flag changes are only here as a safeguard
     loading = true;
@@ -84,14 +84,14 @@ steps = [
   },
   function() {
     console.log(' - Second Render.');
-    page.render(PNGDIR + 'page2.png');
+    page.render(PNGDIR + CALDATE + 'page2.png');
   },
   function() {
     console.log(' - Loading Schedule.');
     page.evaluate( function() {
-      document.form1.__EVENTTARGET.value='btnViewSched';
-      document.form1.__EVENTARGUMENT.value='';
-      document.form1.submit();
+      document.forms[0].__EVENTTARGET.value='btnViewSched';
+      document.forms[0].__EVENTARGUMENT.value='';
+      document.forms[0].submit();
     });
     // These flag changes are only here as a safeguard
     loading = true;
@@ -99,15 +99,15 @@ steps = [
   },
   function() {
     console.log(' - Third Render.');
-    page.render(PNGDIR + 'page3.png');
+    page.render(PNGDIR + CALDATE +'page3.png');
   },
   function() {
     console.log(' - Filtering by name.');
     page.evaluate( function(NAME) {
       document.getElementById('txtNameSearch').value = NAME;
-      document.form1.__EVENTTARGET.value='btnFilter';
-      document.form1.__EVENTARGUMENT.value='';
-      document.form1.submit();
+      document.forms[0].__EVENTTARGET.value='btnFilter';
+      document.forms[0].__EVENTARGUMENT.value='';
+      document.forms[0].submit();
     },NAME);
     // These flag changes are only here as a safeguard
     loading = true;
@@ -115,7 +115,7 @@ steps = [
   },
   function() {
     console.log(' - Fourth Render.');
-    page.render(PNGDIR + 'page4.png');
+    page.render(PNGDIR + CALDATE + 'page4.png');
     fs.write('./dump.html');
   }
 ]
@@ -128,8 +128,10 @@ function onPageLoad(status) {
   loading = false;
   loaded = false;
   console.log('');
+  console.log(page.content);
   if(status=='success') {
     var title = page.evaluate(function() {return document.title;});
+    console.log('Page Loaded, title: ' + title);
     switch (title) {
       case 'CNATRA Web Schedules':
         loaded = true;

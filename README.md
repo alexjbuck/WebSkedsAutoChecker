@@ -10,5 +10,5 @@ Currently this is achieved via a screen rendering to PNG of the schedule.
 Future implementation to include:
  - Text extraction from page data
  - SMS or Email notification of schedule and front page
- - Support for quereying multiple names over multiple squadrons
+ - Support for querying multiple names over multiple squadrons
  - Possibly shifting to CasperJS to let it handle the lower-level navigation work that we don't need access to
