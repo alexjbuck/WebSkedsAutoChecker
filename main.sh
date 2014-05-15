@@ -72,8 +72,6 @@ while : ; do
     JULIAN=$(date -v+1d +%j)
     DATESTR=$(date -v+1d +%Y-%m-%d)
   fi
-  JULIAN=$(date +%j)
-  DATESTR=$(date +%Y-%m-%d)
 
   # Conversion: 5245 == Julian Date 132 (May 12th, 2014)
   CALDATE=JULIAN+5113
