@@ -116,7 +116,7 @@ steps = [
   function() {
     console.log(' - Fourth Render.');
     page.render(PNGDIR + CALDATE + 'page4.png');
-    fs.write('./dump.html');
+    fs.write('./dump.html',page.content,'w');
   }
 ]
 
@@ -131,6 +131,7 @@ function onPageLoad(status) {
   // console.log(page.content);
   if(status=='success') {
     var title = page.evaluate(function() {return document.title;});
+    console.log('');
     console.log('Page Loaded, title: ' + title);
     switch (title) {
       case 'CNATRA Web Schedules':

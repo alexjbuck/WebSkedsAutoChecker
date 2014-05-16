@@ -31,7 +31,7 @@ SQUADRON='VT-6'
 # Your filter name
 NAME='buck'
 # Your phone number for text notification that schedule has been recorded.
-PHONENUM=6302072555
+PHONENUM='6302072555'
 # Location of your Google Drive directory
 GOOGLEDRIVEDIR='/Users/alexanderbuck/Google Drive/WebSchedule/'
 # How long to sleep between attempts
@@ -49,6 +49,7 @@ GOTSKED=false
 GOTFP=false
 # Name of FrontPage directory
 FPDIR='./FrontPage'
+PNGDIR='./PNGs'
 
 
 declare -i JULIAN
@@ -78,7 +79,7 @@ while : ; do
 
 
 
-  if [ -f "$FPDIR/\$$DATESTR\$$SQUADRON\$Frontpage.pdf" ]
+  if [ -f "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf ]
   then
     echo '++ Front page already downloaded.'
     GOTFP=true
@@ -94,8 +95,9 @@ while : ; do
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded front page."
-       curl http://textbelt.com/text -d number=$PHONENUM -d message=\
-       "Front page for $DATESTR now on Google Drive."
+       echo '++ Copying to google drive for sharing and sending SMS notification.'
+       curl http://textbelt.com/text -d number="$PHONENUM" -d message="Front page for $DATESTR now on Google Drive."
+       cp "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$GOOGLEDRIVEDIR""$FPDIR"
     else
        echo "xx"
        echo "xx Failed to download front page."
@@ -104,7 +106,7 @@ while : ; do
   fi
 
 
-  if [  -f ./PNGs/$CALDATE\page3.png  -a  -f ./PNGs/$CALDATE\page4.png ]; then
+  if [  -f ./PNGs/"$CALDATE"\page3.png  -a  -f ./PNGs/"$CALDATE"\page4.png ]; then
     echo "++ Schedule already downloaded."
     GOTSKED=true
   else
@@ -117,11 +119,9 @@ while : ; do
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded schedule."
-       echo '++ Copying files to google drive for sharing and sending SMS notification.'
-       curl http://textbelt.com/text -d number=$PHONENUM -d message=\
-       "Schedule for $DATESTR now on Google Drive."
-       cp -R ./FrontPage $GOOGLEDRIVEDIR
-       cp -R ./PNGs $GOOGLEDRIVEDIR
+       echo '++ Copying to google drive for sharing and sending SMS notification.'
+       curl http://textbelt.com/text -d number="$PHONENUM" -d message="Schedule for $DATESTR now on Google Drive."
+       cp "$PNGDIR"/"$CALDATE"page4.png "$GOOGLEDRIVEDIR""$PNGDIR"
     else
        echo "xx"
        echo "xx Failed to download schedule."
