@@ -4,7 +4,7 @@ echo '************ WebSkedsAutoChecker ************'
 echo '*             by Alexander Buck             *'
 echo '*********************************************'
 
-if [ `which phantomjs` ]; then
+if [ $(which phantomjs) ]; then
   echo
 else
   echo "I cannot find phantomjs on your path."
@@ -13,7 +13,7 @@ else
   echo
   exit 1
 fi
-if [ `which curl` ]; then
+if [ $(which curl) ]; then
   echo
 else
   echo "I cannot find cURL on your path."
@@ -43,14 +43,16 @@ POLLSTOP=8
 # Switch back to higher frequency polling at this hour
 POLLSTART=14
 
-
-# Flags to indicate if the current schedule and frontpage has been downloaded
-GOTSKED=false
-GOTFP=false
 # Name of FrontPage directory
 FPDIR='./FrontPage'
 PNGDIR='./PNGs'
 
+# Flags to indicate if the current schedule and frontpage has been downloaded
+GOTSKED=false
+GOTFP=false
+SLEEPTIMENOW=$(date)
+SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
+SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
 
 declare -i JULIAN
 declare -i CALDATE
@@ -75,8 +77,9 @@ while : ; do
   fi
 
   # Conversion: 5245 == Julian Date 132 (May 12th, 2014)
+  # (I believe January 1st, 2000 is CALDATE 1)
   CALDATE=JULIAN+5113
-
+  echo "** Searching for Front Page and/or Schedule for $DATESTR"
 
 
   if [ -f "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf ]
@@ -121,7 +124,7 @@ while : ; do
        echo "++ Successfully downloaded schedule."
        echo '++ Copying to google drive for sharing and sending SMS notification.'
        curl http://textbelt.com/text -d number="$PHONENUM" -d message="Schedule for $DATESTR now on Google Drive."
-       cp "$PNGDIR"/"$CALDATE"page4.png "$GOOGLEDRIVEDIR""$PNGDIR"
+       cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
     else
        echo "xx"
        echo "xx Failed to download schedule."
@@ -129,26 +132,33 @@ while : ; do
     fi
   fi
 
-  echo "It is now: `date`"
-  if [ "$GOTSKED" = true ] && [ "$GOTFP" = true ]; then
-    # We already have both the Front page and Schedule that we are looking for
-    SLEEPTIME=1800
+
+  if [[ "$GOTSKED" == true && "$GOTFP" == true ]] && [[ "$DATESTR" != $(date +%Y-%m-%d) ]]; then
+    echo "A"
+    # We have both FP/Sked for tomorrow, sleep until tomorrow start time
+    SLEEPUNTILTIME=$(date -j $(date -v+1d +%m%d"$POLLSTART"00%Y))
+    SLEEPUNTILTIMESEC=$(date -j $(date -v+1d +%m%d"$POLLSTART"00%Y) +%s)
+  elif [[ "$GOTSKED" == false || "$GOTFP" == false ]] && [[ "$DATESTR" != $(date +%Y-%m-%d) || $(date +%H)<"$POLLUNTIL" ]]; then
+    echo "C"
+    # We don't have both, and its either not yet tomorrow, or tomorrow before stop time, sleep 60 seconds
+    SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
+    SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
   else
-    # We still don't have one of them, keep polling if within the valid window
-    if [ $(date +%H) -ge $POLLSTART ] || [ $(date +%H) -lt $POLLSTOP ]; then
-      # Inside desired polling timeframe (1400-0800 local time)
-      # Poll once per minute
-      SLEEPTIME=60
-    else
-      # Outside desired polling timeframe
-      # Poll once per 30 minutes
-      SLEEPTIME=1800
-    fi
+    echo "B"
+    # All other cases, sleep until today at start time (derived from logic table analysis)
+    SLEEPUNTILTIME=$(date -j $(date +%m%d"$POLLSTART"00%Y))
+    SLEEPUNTILTIMESEC=$(date -j $(date +%m%d"$POLLSTART"00%Y) +%s)
   fi
 
-  echo "Sleeping for $SLEEPTIME"
+
+  echo "It is now $(date), sleeping until $SLEEPUNTILTIME"
   echo -n "zzz... "
-  sleep $SLEEPTIME
+  while (( ( $(date +%s)<$SLEEPUNTILTIMESEC ) )); do
+    sleep 1
+  done
   echo " ...yawn"
+  echo ""
+  echo ""
+  echo "************************************************************************"
 
 done
