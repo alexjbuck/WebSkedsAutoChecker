@@ -29,17 +29,17 @@ if (args.length>=4) {
   console.log('Shutting Down...');
   phantom.exit(4);
 } else if (args.length<=1) {
-  console.log('No date provided... Using default date and name.');
+  // console.log('No date provided... Using default date and name.');
   NAME = 'buck';
   // skip changing the date, use todays date as loaded on the page
   index = 2;
 } else if (args.length==2) {
   CALDATE = String(parseInt(args[1])+JDATE2CALDATE);
-  console.log('Looking up Schedule for default name on Julian Date: ' + args[1] + ' (CalDate: ' + CALDATE + ')');
+  // console.log('Looking up Schedule for default name on Julian Date: ' + args[1] + ' (CalDate: ' + CALDATE + ')');
 } else if (args.length==3) {
   CALDATE = String(parseInt(args[1])+JDATE2CALDATE);
   NAME=String(args[2]);
-  console.log('Looking up Schedule for "' + NAME + '" on Julian Date: ' + args[1] + ' (CalDate: ' + CALDATE + ')');
+  // console.log('Looking up Schedule for "' + NAME + '" on Julian Date: ' + args[1] + ' (CalDate: ' + CALDATE + ')');
 };
 
 page.onLoadStarted = function() {
