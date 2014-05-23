@@ -116,7 +116,34 @@ steps = [
   function() {
     console.log(' - Fourth Render.');
     page.render(PNGDIR + CALDATE + 'page4.png');
+    // This is for debug/testing/backup purposes
     fs.write('./dump.html',page.content,'w');
+    // Extract the Schedule
+    var schedule = page.evaluate( function() {
+      var dataTable = document.getElementById("dgEvents");
+      var rows = dataTable.querySelectorAll("tr");
+      console.log(dataTable);
+      console.log(rows[0]);
+      var schedule='';
+      for(var i=1;i<rows.length;i++){
+        console.log(rows[i].innerText);
+        var cells = rows[i].querySelectorAll("td");
+        if(i>1){
+          schedule += ' //'
+        }
+        for(var j=0;j<cells.length;j++){
+          if(j!=1 && j!=3 && j!=4 && j!=6 && j!=8){
+            if(cells[j].innerHTML!='&nbsp;'){
+              console.log(j);
+              console.log(cells[j].innerText);
+              schedule += ' ' + cells[j].innerText;
+            }
+          }
+        }
+      }
+      console.log(schedule.length);
+      return schedule
+    });
   }
 ]
 

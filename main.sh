@@ -56,6 +56,8 @@ SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
 
 declare -i JULIAN
 declare -i CALDATE
+declare -i JDATE2CALDATE
+JDATE2CALDATE=5113
 
 # Begin polling loop
 while : ; do
@@ -123,7 +125,10 @@ while : ; do
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded schedule."
        echo '++ Copying to google drive for sharing and sending SMS notification.'
-       curl http://textbelt.com/text -d number="$PHONENUM" -d message="Schedule for $DATESTR now on Google Drive."
+
+       curl http://textbelt.com/text -d number="$PHONENUM" -d message="$(date +%Y-%m-%d): $(cat schedule)"
+       # curl http://textbelt.com/text -d number="$PHONENUM" -d message="Schedule for $DATESTR now on Google Drive."
+
        cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
     else
        echo "xx"
