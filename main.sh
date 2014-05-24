@@ -50,6 +50,7 @@ PNGDIR='./PNGs'
 # Flags to indicate if the current schedule and frontpage has been downloaded
 GOTSKED=false
 GOTFP=false
+FORCE=false
 SLEEPTIMENOW=$(date)
 SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
 SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
@@ -58,6 +59,8 @@ declare -i JULIAN
 declare -i CALDATE
 declare -i JDATE2CALDATE
 JDATE2CALDATE=5113
+# The CALDATE is the number of days since 1 January, 2000
+# caldate=$((   (( $(date -v+1d +%s) - $(date -j 010100002000 +%s) ))/(24*3600)  ))
 
 # Begin polling loop
 while : ; do
@@ -84,7 +87,7 @@ while : ; do
   echo "** Searching for Front Page and/or Schedule for $DATESTR"
 
 
-  if [ -f "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf ]
+  if [ -f "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf ] && [ $FORCE == false ]
   then
     echo '++ Front page already downloaded.'
     GOTFP=true
@@ -111,7 +114,7 @@ while : ; do
   fi
 
 
-  if [  -f ./PNGs/"$CALDATE"\page3.png  -a  -f ./PNGs/"$CALDATE"\page4.png ]; then
+  if [  -f ./PNGs/"$CALDATE"\page3.png  -a  -f ./PNGs/"$CALDATE"\page4.png ] && [ $FORCE == false ]; then
     echo "++ Schedule already downloaded."
     GOTSKED=true
   else
@@ -125,10 +128,8 @@ while : ; do
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded schedule."
        echo '++ Copying to google drive for sharing and sending SMS notification.'
-
-       curl http://textbelt.com/text -d number="$PHONENUM" -d message="$(date +%Y-%m-%d): $(cat schedule)"
+       curl http://textbelt.com/text -d number="$PHONENUM" -d message="$(date +%Y-%m-%d) // $(cat schedule)"
        # curl http://textbelt.com/text -d number="$PHONENUM" -d message="Schedule for $DATESTR now on Google Drive."
-
        cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
     else
        echo "xx"
