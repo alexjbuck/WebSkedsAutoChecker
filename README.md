@@ -38,7 +38,7 @@ POLLSTART=14
 ## Future implementation
  To include:
  - Garbage collection / removing old files (deciding how many to keep)
- - Text extraction from page data
+ - ~~Text extraction from page data~~ (completed)
  - ~~SMS or Email notification of schedule and front page~~ (completed)
  - Support for querying multiple names over multiple squadrons
  - Possibly shifting to [CasperJS](http://www.casperjs.org) to let it handle the lower-level navigation work that we don't need access to
