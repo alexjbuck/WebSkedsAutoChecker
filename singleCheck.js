@@ -124,19 +124,24 @@ steps = [
       var rows = dataTable.querySelectorAll("tr");
       console.log(dataTable);
       console.log(rows[0]);
+      console.log(rows.length)
       var schedule='';
-      for(var i=1;i<rows.length;i++){
-        console.log(rows[i].innerText);
-        var cells = rows[i].querySelectorAll("td");
-        if(i>1){
-          schedule += ' //'
-        }
-        for(var j=0;j<cells.length;j++){
-          if(j!=1 && j!=3 && j!=4 && j!=6 && j!=8){
-            if(cells[j].innerHTML!='&nbsp;'){
-              console.log(j);
-              console.log(cells[j].innerText);
-              schedule += ' ' + cells[j].innerText;
+      if (rows.length<=1){
+        schedule = ' Hooray! Not scheduled!'
+      } else {
+        for(var i=1;i<rows.length;i++){
+          console.log(rows[i].innerText);
+          var cells = rows[i].querySelectorAll("td");
+          if(i>1){
+            schedule += ' //'
+          }
+          for(var j=0;j<cells.length;j++){
+            if(j!=1 && j!=3 && j!=4 && j!=6 && j!=8){
+              if(cells[j].innerHTML!='&nbsp;'){
+                console.log(j);
+                console.log(cells[j].innerText);
+                schedule += ' ' + cells[j].innerText;
+              }
             }
           }
         }
@@ -144,11 +149,17 @@ steps = [
       console.log(schedule.length);
       return schedule
     });
+    // console.log(schedule);
+    fs.write('schedule',schedule,'w');
   }
 ]
 
 page.onConsoleMessage = function(msg, lineNum, sourceId) {
   console.log('CONSOLE: ' + msg + ' (from line #' + lineNum + ' in "' + sourceId + '")');
+};
+
+page.onConsoleMessage = function(msg) {
+  console.log('>> ' + msg);
 };
 
 function onPageLoad(status) {

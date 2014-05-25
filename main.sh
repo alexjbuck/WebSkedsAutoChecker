@@ -50,7 +50,7 @@ PNGDIR='./PNGs'
 # Flags to indicate if the current schedule and frontpage has been downloaded
 GOTSKED=false
 GOTFP=false
-FORCE=false
+FORCE=true
 SLEEPTIMENOW=$(date)
 SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
 SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
@@ -160,7 +160,7 @@ while : ; do
   echo "It is now $(date), sleeping until $SLEEPUNTILTIME"
   echo -n "zzz... "
   while (( ( $(date +%s)<$SLEEPUNTILTIMESEC ) )); do
-    sleep 1
+    sleep 60
   done
   echo " ...yawn"
   echo ""
