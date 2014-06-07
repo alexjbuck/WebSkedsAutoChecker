@@ -23,6 +23,8 @@ fi
 ##################
 # Your Squadron
 SQUADRON='VT-6'
+# Your Training Wing (no dash)
+TRAWING='TW5'
 # Your filter name
 NAME='buck'
 # Your phone number for text notification that schedule has been recorded.
@@ -56,21 +58,49 @@ declare -i CALDATE
 declare -i JDATE2CALDATE
 JDATE2CALDATE=5113
 
-SILENTFLAG=''
+SILENT=false
 
+B='\033[1m'
+NB='\033[0m'
 usage(){
-  echo "usage: skeds [-f] [-v] [-s] [-sq SQUADRON] [-n NAME] [-pn PHONENUMBER]
-               [-gd GOOGLEDRIVEDIR] [-st SLEEPTIME] [-ps POLLSTART]
-               [-pu POLLUNTIL] [--fpdir FPDIR] [--pngdir PNGDIR]
-         skeds -h
-         skeds --help";
+  echo -e "
+"$B"SKEDS"$NB" 0.2, a CNATRA schedule checking/notification program
+
+"$B"Usage:"$NB"  skeds [-f] [-s] [-v] [-sq SQUADRON] [-tw TRAWING]
+              [-n NAME] [-pn PHONENUMBER] [-gd GOOGLEDRIVEDIR]
+              [-st SLEEPTIME] [-ps POLLSTART] [-pu POLLUNTIL]
+              [--fpdir FPDIR] [--pngdir PNGDIR]
+        skeds -h
+        skeds --help
+
+"$B"Optional Flags:"$NB"
+    -h, --help       Show the usage information
+    -f, --force      Force downloading of schedule/front paage even if they have
+                     already been downloaded.
+    -v, --verbose    Print more verbose output statements
+    -s, --silent     Suppres all output statements (overrides -v). Logs output to 'log'
+
+"$B"Key/Value Parameters:"$NB"
+    -sq,--squadron   Set user squadron (e.g. 'VT-6', 'HT-8')
+    -tw,--trawing    Set user training wing (e.g. tw5, TW5, TW1)
+    -n,--name        Set user name for schedule filtering
+    -pn,--phonenumber
+                     Set user phone number for SMS notification
+    -gd,-googledrive Set location of the user google drive directory
+    -st,--sleeptime  Set sleep duration between subsequent polling attempts
+    -ps,--pollstart  Set what hour (24 hour) the polling for the next days schedule
+                      will begin
+    -pu,--polluntil  Set what hour (24 hour) the polling for the current days
+                      schedule will end
+    --fpdir          Set the directory where the Frontpage will be saved
+    --pngdir         Set the directory where the schedule snapshots will be saved
+    "
 }
 
 while [ "$#" -gt 0 ]; do
   key="$1"
   shift
   case $key in
-
     -h|--help)
     usage
     exit
@@ -180,7 +210,7 @@ while : ; do
     echo '** Downloading the front page.'
     echo '**'
 
-    URL=http://www.cnatra.navy.mil/scheds/tw5/SQ-"SQUADRON"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf
+    URL=http://www.cnatra.navy.mil/scheds/"$TRAWING"/SQ-"$SQUADRON"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf
 
     curl -s -S --create-dirs --fail -o "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$URL"
 
@@ -241,7 +271,7 @@ while : ; do
 
 
   echo "It is now $(date), sleeping until $SLEEPUNTILTIME"
-  echo -n "zzz... "
+  echo "zzz... "
   while (( ( $(date +%s)<$SLEEPUNTILTIMESEC ) )); do
     sleep 60
   done
@@ -251,12 +281,10 @@ while : ; do
   echo "************************************************************************"
 
 done
-
 }
 
-extractInputs
 if [ "$SILENT" = true ]; then
-  main > /dev/null
+  main 2>&1 | ./timestamp > log
 else
   main
 fi
