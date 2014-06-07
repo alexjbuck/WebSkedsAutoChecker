@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Error Checking
+######### Dependency Checking #########
 if [ ! $(which phantomjs) ]; then
   echo "I cannot find phantomjs on your path."
   echo "Please download and/or install it first."
@@ -16,7 +16,10 @@ if [ ! $(which curl) ]; then
   exit 2
 fi
 
+##################
 ## USER OPTIONS ##
+##################
+# DEFAULT VALUES #
 ##################
 # Your Squadron
 SQUADRON='VT-6'
@@ -32,15 +35,18 @@ SLEEPTIME=60
 POLLUNTIL=8
 # Switch back to higher frequency polling at this hour
 POLLSTART=14
-
-# Name of FrontPage directory
+# Location of FrontPage directory
 FPDIR='./FrontPage'
+# Location of PNG directory
 PNGDIR='./PNGs'
+# Force update
+FORCE=false
+
+
 
 # Flags to indicate if the current schedule and frontpage has been downloaded
 GOTSKED=false
 GOTFP=false
-FORCE=false
 SLEEPTIMENOW=$(date)
 SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
 SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
@@ -53,11 +59,11 @@ JDATE2CALDATE=5113
 SILENTFLAG=''
 
 usage(){
-  echo "usage: skeds [-f] [-s] [-sq SQUADRON] [-n NAME] [-pn PHONENUMBER]"
-  echo "             [-gd GOOGLEDRIVEDIR] [-st SLEEPTIME] [-ps POLLSTART]"
-  echo "             [-pu POLLUNTIL] [--fpdir FPDIR] [--pngdir PNGDIR]"
-  echo "       skeds -h"
-  echo "       skeds --help";
+  echo "usage: skeds [-f] [-v] [-s] [-sq SQUADRON] [-n NAME] [-pn PHONENUMBER]
+               [-gd GOOGLEDRIVEDIR] [-st SLEEPTIME] [-ps POLLSTART]
+               [-pu POLLUNTIL] [--fpdir FPDIR] [--pngdir PNGDIR]
+         skeds -h
+         skeds --help";
 }
 
 while [ "$#" -gt 0 ]; do
@@ -74,8 +80,12 @@ while [ "$#" -gt 0 ]; do
     FORCE=true
     ;;
 
+    -v|--verbose)
+    VERBOSE=true
+    ;;
+
     -s|--silent)
-    SILENTFLAG=$key
+    SILENT=true
     ;;
 
     -sq|--squadron)
@@ -128,7 +138,7 @@ done
 
 main(){
 echo ''
-echo '************ WebSkedsAutoChecker ************'
+echo '************        Skeds        ************'
 echo '*             by Alexander Buck             *'
 echo '*********************************************'
 
@@ -170,9 +180,9 @@ while : ; do
     echo '** Downloading the front page.'
     echo '**'
 
-    URL=http://www.cnatra.navy.mil/scheds/tw5/SQ-VT-6/\$$DATESTR\$$SQUADRON\$Frontpage.pdf
+    URL=http://www.cnatra.navy.mil/scheds/tw5/SQ-"SQUADRON"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf
 
-    curl -s -S --create-dirs --fail -o $FPDIR/\$$DATESTR\$$SQUADRON\$Frontpage.pdf $URL
+    curl -s -S --create-dirs --fail -o "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$URL"
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded front page."
@@ -245,7 +255,7 @@ done
 }
 
 extractInputs
-if [ "$SILENTFLAG" = "--silent" ] || [ "$SILENTFLAG" = "-s" ]; then
+if [ "$SILENT" = true ]; then
   main > /dev/null
 else
   main
