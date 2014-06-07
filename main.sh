@@ -50,7 +50,7 @@ PNGDIR='./PNGs'
 # Flags to indicate if the current schedule and frontpage has been downloaded
 GOTSKED=false
 GOTFP=false
-FORCE=true
+FORCE=false
 SLEEPTIMENOW=$(date)
 SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
 SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
