@@ -117,7 +117,7 @@ steps = [
     console.log(' - Fourth Render.');
     page.render(PNGDIR + CALDATE + 'page4.png');
     // This is for debug/testing/backup purposes
-    fs.write('./dump.html',page.content,'w');
+    // fs.write('./dump.html',page.content,'w');
     // Extract the Schedule
     var schedule = page.evaluate( function() {
       var dataTable = document.getElementById("dgEvents");
