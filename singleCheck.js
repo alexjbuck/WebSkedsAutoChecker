@@ -22,6 +22,7 @@ var CALDATE='';
 var JDATE2CALDATE = 5113;
 var PNGDIR = './PNGs/';
 
+
 if (args.length>=4) {
   console.log('phantomjs singleCheck.js (JDATE) (NAME)');
   console.log('Usage Error.');
@@ -49,7 +50,10 @@ page.onLoadStarted = function() {
 }
 page.onLoadFinished = onPageLoad;
 
+/*---------------*/
+steps=longSteps;
 page.open(address);
+/*---------------*/
 
 setInterval(function () {
   fs.write("/dev/stdout", ".", "w");
@@ -68,7 +72,74 @@ setInterval(function () {
 },250);
 
 
-steps = [
+shortSteps = [
+  function() {
+    console.log(' - Initial Render.');
+    page.render(PNGDIR + CALDATE +'page1.png');
+  },
+  function() {
+    console.log(' - Changing Date.');
+    page.evaluate( function(CALDATE) {
+      __doPostBack('ctrlCalendar',CALDATE);
+    },CALDATE);
+    // These flag changes are only here as a safeguard
+    loading = true;
+    loaded = false;
+  },
+  function() {
+    console.log(' - Filtering by name.');
+    page.evaluate( function(NAME) {
+      document.getElementById('txtNameSearch').value = NAME;
+      document.forms[0].__EVENTTARGET.value='btnFilter';
+      document.forms[0].__EVENTARGUMENT.value='';
+      document.forms[0].submit();
+    },NAME);
+    // These flag changes are only here as a safeguard
+    loading = true;
+    loaded = false;
+  },
+  function() {
+    console.log(' - Render.');
+    page.render(PNGDIR + CALDATE + 'page4.png');
+    // This is for debug/testing/backup purposes
+    // fs.write('./dump.html',page.content,'w');
+    // Extract the Schedule
+    var schedule = page.evaluate( function() {
+      var dataTable = document.getElementById("dgEvents");
+      var rows = dataTable.querySelectorAll("tr");
+      console.log(dataTable);
+      console.log(rows[0]);
+      console.log(rows.length)
+      var schedule='';
+      if (rows.length<=1){
+        schedule = ' Hooray! Not scheduled!'
+      } else {
+        for(var i=1;i<rows.length;i++){
+          console.log(rows[i].innerText);
+          var cells = rows[i].querySelectorAll("td");
+          if(i>1){
+            schedule += ' //'
+          }
+          for(var j=0;j<cells.length;j++){
+            if(j!=1 && j!=3 && j!=4 && j!=6 && j!=8){
+              if(cells[j].innerHTML!='&nbsp;'){
+                console.log(j);
+                console.log(cells[j].innerText);
+                schedule += ' ' + cells[j].innerText;
+              }
+            }
+          }
+        }
+      }
+      console.log(schedule.length);
+      return schedule
+    });
+    // console.log(schedule);
+    fs.write('schedule',schedule,'w');
+  }
+]
+
+longSteps = [
   function() {
     console.log(' - Initial Render.');
     page.render(PNGDIR + CALDATE +'page1.png');
