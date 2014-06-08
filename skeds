@@ -16,156 +16,139 @@ if [ ! $(which curl) ]; then
   exit 2
 fi
 
-##################
-## USER OPTIONS ##
-##################
-# DEFAULT VALUES #
-##################
-# Your Squadron
-SQUADRON='VT-6'
-# Your Training Wing (no dash)
-TRAWING='TW5'
-# Your filter name
-NAME='buck'
-# Your phone number for text notification that schedule has been recorded.
-PHONENUM='6302072555'
-# Location of your Google Drive directory
-GOOGLEDRIVEDIR='/Users/alexanderbuck/Google Drive/WebSchedule/'
-# How long to sleep between attempts
-SLEEPTIME=60
-# Keep looking for the next day schedule up until this hour on that day
-POLLUNTIL=8
-# Switch back to higher frequency polling at this hour
-POLLSTART=14
-# Location of FrontPage directory
-FPDIR='./FrontPage'
-# Location of PNG directory
-PNGDIR='./PNGs'
-# Force update
+# Flags
 FORCE=false
-
-
-
-# Flags to indicate if the current schedule and frontpage has been downloaded
+SILENT=false
 GOTSKED=false
 GOTFP=false
-SLEEPTIMENOW=$(date)
-SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
-SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
 
 declare -i JULIAN
 declare -i CALDATE
 declare -i JDATE2CALDATE
 JDATE2CALDATE=5113
 
-SILENT=false
-
 B='\033[1m'
-NB='\033[0m'
+U='\033[4m'
+N='\033[0m'
 usage(){
   echo -e "
-"$B"SKEDS"$NB" 0.2, a CNATRA schedule checking/notification program
+"$B"SKEDS"$N" 0.2.0, a CNATRA schedule checking/notification program
 
-"$B"Usage:"$NB"  skeds [-f] [-s] [-v] [-sq SQUADRON] [-tw TRAWING]
+"$B"Usage:"$N"  skeds [-f] [-s] [-v] [-sq SQUADRON] [-tw TRAWING]
               [-n NAME] [-pn PHONENUMBER] [-gd GOOGLEDRIVEDIR]
               [-st SLEEPTIME] [-ps POLLSTART] [-pu POLLUNTIL]
               [--fpdir FPDIR] [--pngdir PNGDIR]
+        skeds -c CONFIGFILE [-f,s,v,sq,tw,n,pn,gd,st,ps,pu... VALUE]
         skeds -h
         skeds --help
 
-"$B"Optional Flags:"$NB"
-    -h, --help       Show the usage information
-    -f, --force      Force downloading of schedule/front paage even if they have
-                     already been downloaded.
-    -v, --verbose    Print more verbose output statements
-    -s, --silent     Suppres all output statements (overrides -v). Logs output to 'log'
+"$B"Optional Flags:"$N"
+    -h, --help      Show the usage information
+    -f, --force     Force downloading of schedule/front paage even if they have
+                      already been downloaded.
+    -v, --verbose   Print more verbose output statements
+    -s, --silent    Suppres all output statements (overrides -v). Logs output to 'log'
 
-"$B"Key/Value Parameters:"$NB"
-    -sq,--squadron   Set user squadron (e.g. 'VT-6', 'HT-8')
-    -tw,--trawing    Set user training wing (e.g. tw5, TW5, TW1)
-    -n,--name        Set user name for schedule filtering
-    -pn,--phonenumber
-                     Set user phone number for SMS notification
-    -gd,-googledrive Set location of the user google drive directory
-    -st,--sleeptime  Set sleep duration between subsequent polling attempts
-    -ps,--pollstart  Set what hour (24 hour) the polling for the next days schedule
-                      will begin
-    -pu,--polluntil  Set what hour (24 hour) the polling for the current days
-                      schedule will end
-    --fpdir          Set the directory where the Frontpage will be saved
-    --pngdir         Set the directory where the schedule snapshots will be saved
+"$B"Key/Value Parameters:"$N"
+    -c,--config "$U"configfile"$N" [-key VALUE]
+              Provide a configuration file that has a single line with the properly
+              formatted key/value pairs.
+              e.g. '-sq VT-6 -tw tw5 -n smith -pn 2345678989 ...'
+              Any key/value pair supplied directly on the command line will override
+              the values within the configuration file
+
+    -sq,--squadron "$U"squadron"$N"
+              Set the user squadron (e.g. 'VT-6', 'HT-8')
+
+    -tw,--trawing "$U"trawing"$N"
+              Set the user training wing (e.g. tw5, TW5, TW1)
+
+    -n,--name "$U"name"$N"
+              Set the user name for schedule filtering
+
+    -pn,--phonenumber "$U"number"$N"
+              Set the user phone number for SMS notification
+
+    -gd,-googledrive "$U"directory"$N"
+              Set location of the user google drive directory
+
+    -st,--sleeptime "$U"seconds"$N"
+              Set sleep duration between subsequent polling attempts
+
+    -ps,--pollstart "$U"hour"$N"
+              Set what hour (24 hour) the polling for the next days schedule begins
+
+    -pu,--polluntil "$U"hour"$N"
+              Set what hour (24 hour) the polling for the current days schedule ends
+
+    --fpdir "$U"directory"$N"
+              Set the directory where the Frontpage will be saved
+
+    --pngdir "$U"directory"$N"
+              Set the directory where the schedule snapshots will be saved
     "
 }
+
+if [ "$#" -eq 0 ]; then
+  usage
+  exit
+fi
 
 while [ "$#" -gt 0 ]; do
   key="$1"
   shift
   case $key in
+    -c|--config)
+      config="$1"
+      shift
+      ./skeds $(cat "$config") "$*"
+      exit;;
     -h|--help)
-    usage
-    exit
-    ;;
-
+      usage
+      exit;;
     -f|--force)
-    FORCE=true
-    ;;
-
+      FORCE=true
+      ;;
     -v|--verbose)
-    VERBOSE=true
-    ;;
-
+      VERBOSE=true
+      ;;
     -s|--silent)
-    SILENT=true
-    ;;
-
+      SILENT=true
+      ;;
     -sq|--squadron)
-    SQUADRON="$1"
-    shift
-    ;;
-
+      SQUADRON="$1"
+      shift;;
     -n|--name)
-    NAME="$1"
-    shift
-    ;;
-
+      NAME="$1"
+      shift;;
     -pn|--phonenumber)
-    PHONENUM="$1"
-    shift
-    ;;
-
+      PHONENUM="$1"
+      shift;;
     -gd|--googledrive)
-    GOOGLEDRIVEDIR="$1"
-    shift
-    ;;
-
+      GOOGLEDRIVEDIR="$1"
+      shift;;
     -st|--sleeptime)
-    SLEEPTIME="$1"
-    shift
-    ;;
-
+      SLEEPTIME="$1"
+      shift;;
     -ps|--pollstart)
-    POLLSTART="$1"
-    shift
-    ;;
-
+      POLLSTART="$1"
+      shift;;
     -pu|--polluntil)
-    POLLUNTIL="$1"
-    shift
-    ;;
-
+      POLLUNTIL="$1"
+      shift;;
     --fpdir)
-    FPDIR="$1"
-    shift
-    ;;
-
+      FPDIR="$1"
+      shift;;
     --pngdir)
-    PNGDIR="$1"
-    shift
-    ;;
+      PNGDIR="$1"
+      shift;;
   esac
 done
 
 
+################################################################################
+################################## main ########################################
+################################################################################
 main(){
 echo ''
 echo '************        Skeds        ************'
@@ -253,17 +236,14 @@ while : ; do
 
 
   if [[ "$GOTSKED" == true && "$GOTFP" == true ]] && [[ "$DATESTR" != $(date +%Y-%m-%d) ]]; then
-    echo "A"
     # We have both FP/Sked for tomorrow, sleep until tomorrow start time
     SLEEPUNTILTIME=$(date -j $(date -v+1d +%m%d"$POLLSTART"00%Y))
     SLEEPUNTILTIMESEC=$(date -j $(date -v+1d +%m%d"$POLLSTART"00%Y) +%s)
   elif [[ "$GOTSKED" == false || "$GOTFP" == false ]] && [[ "$DATESTR" != $(date +%Y-%m-%d) || $(date +%H)<"$POLLUNTIL" ]]; then
-    echo "C"
     # We don't have both, and its either not yet tomorrow, or tomorrow before stop time, sleep 60 seconds
     SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
     SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
   else
-    echo "B"
     # All other cases, sleep until today at start time (derived from logic table analysis)
     SLEEPUNTILTIME=$(date -j $(date +%m%d"$POLLSTART"00%Y))
     SLEEPUNTILTIMESEC=$(date -j $(date +%m%d"$POLLSTART"00%Y) +%s)
@@ -282,9 +262,30 @@ while : ; do
 
 done
 }
+################################################################################
+
+
+################################################################################
+################################ timestamp #####################################
+################################################################################
+timestamp() {
+  if [ $# -gt 0 ]; then
+    # command line input mode
+    echo $(date +'[%Y-%m-%m] %H:%M:%S >>') "$*"
+  else
+    # pipe mode
+    while :
+    do
+      if read -t 1 input ; then
+        echo $(date +'[%Y-%m-%m] %H:%M:%S >>') "$input"
+      fi
+    done
+  fi
+}
+################################################################################
 
 if [ "$SILENT" = true ]; then
-  main 2>&1 | ./timestamp > log
+  main 2>&1 | timestamp > log
 else
   main
 fi
