@@ -23,6 +23,29 @@ var JDATE2CALDATE = 5113;
 var PNGDIR = './PNGs/';
 
 
+// IN PROGRESS // *****// *****// *****// *****// *****// *****// *****
+// shift out the first input because it is the name of the calling javascript file (these are inputs relative to the 'phantomjs' call)
+/*
+args.shift();
+while(args.length>0){
+  key=args[0];
+  args.shift();
+  switch(key) {
+    case "-n": // Fallthrough
+    case "--name":
+      NAME=args[0];
+      args.shift();
+      break;
+    case "-d": // Fallthrough
+    case "--date":
+      JDATE=args[0];
+      args.shift();
+      break;
+  }
+  */
+}// *****// *****// *****// *****// *****// *****// *****// *****// *****
+
+
 if (args.length>=4) {
   console.log('phantomjs singleCheck.js (JDATE) (NAME)');
   console.log('Usage Error.');
@@ -43,33 +66,7 @@ if (args.length>=4) {
   // console.log('Looking up Schedule for "' + NAME + '" on Julian Date: ' + args[1] + ' (CalDate: ' + CALDATE + ')');
 };
 
-page.onLoadStarted = function() {
-  loading = true;
-  loaded = false;
-  console.log('Attempting to load address.');
-}
-page.onLoadFinished = onPageLoad;
 
-/*---------------*/
-steps=longSteps;
-page.open(address);
-/*---------------*/
-
-setInterval(function () {
-  fs.write("/dev/stdout", ".", "w");
-  if (!loaded || loading){
-    return;
-  }
-  console.log('');
-  if (typeof steps[index] != 'function') {
-    console.log('Script Complete!');
-    phantom.exit(0);
-  }
-  if (!loading && typeof steps[index] == 'function') {
-    console.log('Executing Step ' + (index+1));
-    steps[index++]();
-  }
-},250);
 
 
 shortSteps = [
@@ -225,6 +222,8 @@ longSteps = [
   }
 ]
 
+
+
 page.onConsoleMessage = function(msg, lineNum, sourceId) {
   console.log('CONSOLE: ' + msg + ' (from line #' + lineNum + ' in "' + sourceId + '")');
 };
@@ -232,6 +231,14 @@ page.onConsoleMessage = function(msg, lineNum, sourceId) {
 page.onConsoleMessage = function(msg) {
   console.log('>> ' + msg);
 };
+
+
+
+page.onLoadStarted = function() {
+  loading = true;
+  loaded = false;
+  console.log('Attempting to load address.');
+}
 
 function onPageLoad(status) {
   loading = false;
@@ -264,3 +271,26 @@ function onPageLoad(status) {
     phantom.exit(1);
   }
 }
+
+
+page.onLoadFinished = onPageLoad;
+steps=longSteps;
+
+/*---------------*/
+page.open(address);
+setInterval(function () {
+  fs.write("/dev/stdout", ".", "w");
+  if (!loaded || loading){
+    return;
+  }
+  console.log('');
+  if (typeof steps[index] != 'function') {
+    console.log('Script Complete!');
+    phantom.exit(0);
+  }
+  if (!loading && typeof steps[index] == 'function') {
+    console.log('Executing Step ' + (index+1));
+    steps[index++]();
+  }
+},250);
+/*---------------*/
