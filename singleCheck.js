@@ -6,7 +6,7 @@
   3 - Bad date selected
   4 - Bad arguments
 */
-
+console.log('first alert');
 var page = require('webpage').create();
 var fs = require("fs");
 var sys = require("system");
@@ -21,7 +21,7 @@ var NAME='buck';
 var CALDATE='';
 var JDATE2CALDATE = 5113;
 var PNGDIR = './PNGs/';
-
+console.log('second alert');
 
 // IN PROGRESS // *****// *****// *****// *****// *****// *****// *****
 // shift out the first input because it is the name of the calling javascript file (these are inputs relative to the 'phantomjs' call)
