@@ -221,13 +221,17 @@ if [ $GOOGLEDRIVEDIR ]; then
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded front page."
-       if [ $GOOGLEDRIVEDIR ] && [ ! $SUPPRESSGD ]; then
+       if [ $GOOGLEDRIVEDIR ]; then
          echo "++ Copying to google drive for sharing"
-         cp "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$GOOGLEDRIVEDIR""$FPDIR"
+         if [ ! $SUPPRESSGD ]; then
+           cp "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$GOOGLEDRIVEDIR""$FPDIR"
+         fi
        fi
-       if [ $PHONENUM ] && [ ! $SUPPRESSSMS ]; then
+       if [ $PHONENUM ]; then
          echo "++ Sending SMS notification."
-         curl http://textbelt.com/text -d number="$PHONENUM" -d message="Front page for $DATESTR now on Google Drive."
+         if [ ! $SUPPRESSSMS ]; then
+           curl http://textbelt.com/text -d number="$PHONENUM" -d message="Front page for $DATESTR now on Google Drive."
+         fi
        fi
     else
        echo "xx"
@@ -254,13 +258,17 @@ fi
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded schedule."
-       if [ $GOOGLEDRIVEDIR ] && [ ! $SUPPRESSGD ]; then
+       if [ $GOOGLEDRIVEDIR ]; then
          echo "++ Copying to google drive for sharing"
-         cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
+         if [ ! $SUPPRESSGD ]; then
+           cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
+         fi
        fi
-       if [ $PHONENUM ] && [ ! $SUPPRESSSMS ]; then
+       if [ $PHONENUM ] &&; then
          echo "++ Sending SMS notification."
-         curl http://textbelt.com/text -d number="$PHONENUM" -d message="$(date +%Y-%m-%d) // $(cat schedule)"
+         if [ ! $SUPPRESSSMS ]; then
+           curl http://textbelt.com/text -d number="$PHONENUM" -d message="$(date +%Y-%m-%d) // $(cat schedule)"
+         fi
        fi
     else
        echo "xx"
