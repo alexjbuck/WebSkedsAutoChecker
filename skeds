@@ -21,6 +21,8 @@ FORCE=false
 SILENT=false
 GOTSKED=false
 GOTFP=false
+SUPPRESSSMS=false
+SUPPRESSGD=false
 
 declare -i JULIAN
 declare -i CALDATE
@@ -86,12 +88,18 @@ usage(){
 
     --pngdir "$U"directory"$N"
               Set the directory where the schedule snapshots will be saved
+
+    --suppress-sms
+              Suppress SMS sending, even if a phone number is supplied
+
+    --suppress-gd
+              Suppress Google Drive functionality, even if a directory is supplied
     "
 }
 
 if [ "$#" -eq 0 ]; then
   usage
-  exit
+  exit 1
 fi
 
 while [ "$#" -gt 0 ]; do
@@ -102,10 +110,10 @@ while [ "$#" -gt 0 ]; do
       config="$1"
       shift
       ./skeds $(cat "$config") "$*"
-      exit;;
+      exit 1;;
     -h|--help)
       usage
-      exit;;
+      exit 1;;
     -f|--force)
       FORCE=true
       ;;
@@ -114,6 +122,12 @@ while [ "$#" -gt 0 ]; do
       ;;
     -s|--silent)
       SILENT=true
+      ;;
+    --suppress-sms)
+      SUPPRESSSMS=true
+      ;;
+    --suppress-gd)
+      SUPPRESSGD=true
       ;;
     -sq|--squadron)
       SQUADRON="$1"
@@ -145,6 +159,10 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
+if [ ! $GOOGLEDRIVEDIR ] && [ ! $PHONENUM ]; then
+  echo "Incorrect usage. Either a google drive directory or a phone number MUST be supplied. 'skeds --help' for more information"
+  exit 1
+fi
 
 ################################################################################
 ################################## main ########################################
@@ -168,13 +186,13 @@ while : ; do
       DATESTR=$(date +%Y-%m-%d)
     else
       # I already have both, set the date for the next day
-      JULIAN=$(date -v+1d +%j)
-      DATESTR=$(date -v+1d +%Y-%m-%d)
+      JULIAN=$(date -d tomorrow +%j)
+      DATESTR=$(date -d tomorrow +%Y-%m-%d)
     fi
   else
     # Its after "$SEARCHUNTIL" time, so give up on today and move to tomorrow
-    JULIAN=$(date -v+1d +%j)
-    DATESTR=$(date -v+1d +%Y-%m-%d)
+    JULIAN=$(date -d tomorrow +%j)
+    DATESTR=$(date -d tomorrow +%Y-%m-%d)
   fi
 
   # Conversion: 5245 == Julian Date 132 (May 12th, 2014)
@@ -182,7 +200,11 @@ while : ; do
   CALDATE=JULIAN+5113
   echo "** Searching for Front Page and/or Schedule for $DATESTR"
 
-
+###########################
+### DOWNLOAD FRONT PAGE ###
+###########################
+## Only download frontpage if its going to get posted somewhere.
+if [ $GOOGLEDRIVEDIR ]; then
   if [ -f "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf ] && [ $FORCE == false ]
   then
     echo '++ Front page already downloaded.'
@@ -199,17 +221,26 @@ while : ; do
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded front page."
-       echo '++ Copying to google drive for sharing and sending SMS notification.'
-       curl http://textbelt.com/text -d number="$PHONENUM" -d message="Front page for $DATESTR now on Google Drive."
-       cp "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$GOOGLEDRIVEDIR""$FPDIR"
+       if [ $GOOGLEDRIVEDIR ] && [ ! $SUPPRESSGD ]; then
+         echo "++ Copying to google drive for sharing"
+         cp "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$GOOGLEDRIVEDIR""$FPDIR"
+       fi
+       if [ $PHONENUM ] && [ ! $SUPPRESSSMS ]; then
+         echo "++ Sending SMS notification."
+         curl http://textbelt.com/text -d number="$PHONENUM" -d message="Front page for $DATESTR now on Google Drive."
+       fi
     else
        echo "xx"
        echo "xx Failed to download front page."
        echo "xx"
     fi
   fi
+fi
 
 
+#########################
+### DOWNLOAD SCHEDULE ###
+#########################
   if [  -f ./PNGs/"$CALDATE"\page3.png  -a  -f ./PNGs/"$CALDATE"\page4.png ] && [ $FORCE == false ]; then
     echo "++ Schedule already downloaded."
     GOTSKED=true
@@ -223,10 +254,14 @@ while : ; do
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded schedule."
-       echo '++ Copying to google drive for sharing and sending SMS notification.'
-       curl http://textbelt.com/text -d number="$PHONENUM" -d message="$(date +%Y-%m-%d) // $(cat schedule)"
-       # curl http://textbelt.com/text -d number="$PHONENUM" -d message="Schedule for $DATESTR now on Google Drive."
-       cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
+       if [ $GOOGLEDRIVEDIR ] && [ ! $SUPPRESSGD ]; then
+         echo "++ Copying to google drive for sharing"
+         cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
+       fi
+       if [ $PHONENUM ] && [ ! $SUPPRESSSMS ]; then
+         echo "++ Sending SMS notification."
+         curl http://textbelt.com/text -d number="$PHONENUM" -d message="$(date +%Y-%m-%d) // $(cat schedule)"
+       fi
     else
        echo "xx"
        echo "xx Failed to download schedule."
@@ -237,23 +272,23 @@ while : ; do
 
   if [[ "$GOTSKED" == true && "$GOTFP" == true ]] && [[ "$DATESTR" != $(date +%Y-%m-%d) ]]; then
     # We have both FP/Sked for tomorrow, sleep until tomorrow start time
-    SLEEPUNTILTIME=$(date -j $(date -v+1d +%m%d"$POLLSTART"00%Y))
-    SLEEPUNTILTIMESEC=$(date -j $(date -v+1d +%m%d"$POLLSTART"00%Y) +%s)
+    SLEEPUNTILTIME=$(date -d ""$POLLSTART"00 tomorrow")
+    SLEEPUNTILTIMESEC=$(date -d ""$POLLSTART"00 tomorrow" +%s)
   elif [[ "$GOTSKED" == false || "$GOTFP" == false ]] && [[ "$DATESTR" != $(date +%Y-%m-%d) || $(date +%H)<"$POLLUNTIL" ]]; then
     # We don't have both, and its either not yet tomorrow, or tomorrow before stop time, sleep 60 seconds
-    SLEEPUNTILTIME=$(date -v+"$SLEEPTIME"S)
-    SLEEPUNTILTIMESEC=$(date -v+"$SLEEPTIME"S +%s)
+    SLEEPUNTILTIME=$(date -d ""$SLEEPTIME" seconds")
+    SLEEPUNTILTIMESEC=$(date -d ""$SLEEPTIME" seconds" +%s)
   else
     # All other cases, sleep until today at start time (derived from logic table analysis)
-    SLEEPUNTILTIME=$(date -j $(date +%m%d"$POLLSTART"00%Y))
-    SLEEPUNTILTIMESEC=$(date -j $(date +%m%d"$POLLSTART"00%Y) +%s)
+    SLEEPUNTILTIME=$(date -d ""$POLLSTART"00")
+    SLEEPUNTILTIMESEC=$(date -d ""$POLLSTART"00" +%s)
   fi
 
 
   echo "It is now $(date), sleeping until $SLEEPUNTILTIME"
   echo "zzz... "
   while (( ( $(date +%s)<$SLEEPUNTILTIMESEC ) )); do
-    sleep 60
+    sleep "$SLEEPTIME"
   done
   echo " ...yawn"
   echo ""
