@@ -109,7 +109,7 @@ while [ "$#" -gt 0 ]; do
     -c|--config)
       config="$1"
       shift
-      ./skeds $(cat "$config") "$*"
+      ./skeds $(cat "$config") "$*" &
       exit 1;;
     -h|--help)
       usage
