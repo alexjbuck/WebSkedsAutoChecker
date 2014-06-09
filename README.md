@@ -1,6 +1,8 @@
 # Skeds
 
 ## Overview
+This branch is being developed for the Raspberry Pi, there are a few semantic differences from the MacOSX environment in which it was originally developed.
+
 A program that downloads the [CNATRA Web Schedule](http://www.cnatra.navy.mil/scheds/) using [**PhantomJS**](http://phantomjs.org/) and sends SMS notifications via [TextBelt API](http://textbelt.com/)
 
 The uptime of the CNATRA website is very poor so this creates a local copy anytime it is found to be up. The script first checks if a local copy exists, if it does it sleeps for some time before checking again. If a local copy does not exist it attempts to connect to the CNATRA webpage and request the schedule. Both the full squadron schedule and the name-filtered results are taken as screen captures. Additionally the page source is parsed for the name-filtered schedule result which is sent as a text message via the TextBelt API to the cell phone number on file.
