@@ -239,6 +239,9 @@ if [ $GOOGLEDRIVEDIR ]; then
        echo "xx"
     fi
   fi
+else
+  # So it doesn't get stuck thinking it doesn't have the FrontPage but being unable to download it
+  GOTFP=true
 fi
 
 
