@@ -264,7 +264,7 @@ fi
            cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
          fi
        fi
-       if [ $PHONENUM ] &&; then
+       if [ $PHONENUM ]; then
          echo "++ Sending SMS notification."
          if [ ! $SUPPRESSSMS ]; then
            curl http://textbelt.com/text -d number="$PHONENUM" -d message="$(date +%Y-%m-%d) // $(cat schedule)"
