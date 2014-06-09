@@ -159,7 +159,7 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-if [ ! $GOOGLEDRIVEDIR ] && [ ! $PHONENUM ]; then
+if [ ! "$GOOGLEDRIVEDIR" ] && [ ! "$PHONENUM" ]; then
   echo "Incorrect usage. Either a google drive directory or a phone number MUST be supplied. 'skeds --help' for more information"
   exit 1
 fi
@@ -204,7 +204,7 @@ while : ; do
 ### DOWNLOAD FRONT PAGE ###
 ###########################
 ## Only download frontpage if its going to get posted somewhere.
-if [ $GOOGLEDRIVEDIR ]; then
+if [ "$GOOGLEDRIVEDIR" ]; then
   if [ -f "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf ] && [ $FORCE == false ]
   then
     echo '++ Front page already downloaded.'
@@ -221,15 +221,15 @@ if [ $GOOGLEDRIVEDIR ]; then
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded front page."
-       if [ $GOOGLEDRIVEDIR ]; then
+       if [ "$GOOGLEDRIVEDIR" ]; then
          echo "++ Copying to google drive for sharing"
-         if [ ! $SUPPRESSGD ]; then
+         if [ ! "$SUPPRESSGD" == false ]; then
            cp "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$GOOGLEDRIVEDIR""$FPDIR"
          fi
        fi
-       if [ $PHONENUM ]; then
+       if [ "$PHONENUM" ]; then
          echo "++ Sending SMS notification."
-         if [ ! $SUPPRESSSMS ]; then
+         if [ "$SUPPRESSSMS" == false ]; then
            curl http://textbelt.com/text -d number="$PHONENUM" -d message="Front page for $DATESTR now on Google Drive."
          fi
        fi
@@ -261,16 +261,15 @@ fi
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded schedule."
-       if [ $GOOGLEDRIVEDIR ]; then
+       if [ "$GOOGLEDRIVEDIR" ]; then
          echo "++ Copying to google drive for sharing"
-         if [ ! $SUPPRESSGD ]; then
+         if [ ! "$SUPPRESSGD" == false ]; then
            cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
          fi
        fi
-       if [ $PHONENUM ]; then
+       if [ "$PHONENUM" ]; then
          echo "++ Sending SMS notification."
-         if [ ! $SUPPRESSSMS ]; then
-           echo "for real sending message"
+         if [ "$SUPPRESSSMS" == false ]; then
            curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$(date +%Y-%m-%d) // $(cat schedule)'"
          fi
        fi
