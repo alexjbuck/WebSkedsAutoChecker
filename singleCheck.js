@@ -23,7 +23,7 @@ var JDATE2CALDATE = 5113;
 var PNGDIR = './PNGs/';
 
 
-// IN PROGRESS // *****// *****// *****// *****// *****// *****// *****
+// IN PROGRESS
 // shift out the first input because it is the name of the calling javascript file (these are inputs relative to the 'phantomjs' call)
 /*
 args.shift();
@@ -42,9 +42,8 @@ while(args.length>0){
       args.shift();
       break;
   }
-  */
-}// *****// *****// *****// *****// *****// *****// *****// *****// *****
-
+}
+*/
 
 if (args.length>=4) {
   console.log('phantomjs singleCheck.js (JDATE) (NAME)');
