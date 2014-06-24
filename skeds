@@ -330,8 +330,12 @@ timestamp() {
 }
 ################################################################################
 
+if [ ! -d "$NAME" ]; then
+  mkdir "$NAME"
+fi
+
 if [ "$SILENT" = true ]; then
-  main 2>&1 | timestamp > "$NAME"/log
+  main 2>&1 | timestamp > ./"$NAME"/log
 else
   main
 fi
