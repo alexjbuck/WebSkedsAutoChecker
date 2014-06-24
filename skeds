@@ -270,7 +270,7 @@ fi
        if [ "$PHONENUM" ]; then
          echo "++ Sending SMS notification."
          if [ "$SUPPRESSSMS" == false ]; then
-           curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$(date +%Y-%m-%d) // $(cat "$NAME"/schedule_"$NAME")'"
+           curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$(date +%Y-%m-%d) // $(cat "$NAME"/schedule)'"
          fi
        fi
     else
