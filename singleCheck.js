@@ -69,7 +69,7 @@ if (args.length>=4) {
 shortSteps = [
   function() {
     console.log(' - Initial Render.');
-    page.render(PNGDIR + CALDATE +'page1.png');
+    //page.render(PNGDIR + CALDATE +'page1.png');
   },
   function() {
     console.log(' - Changing Date.');
@@ -94,7 +94,7 @@ shortSteps = [
   },
   function() {
     console.log(' - Render.');
-    page.render(PNGDIR + CALDATE + 'page4.png');
+    //page.render(PNGDIR + CALDATE + 'page4.png');
     // This is for debug/testing/backup purposes
     // fs.write('./dump.html',page.content,'w');
     // Extract the Schedule
@@ -136,7 +136,7 @@ shortSteps = [
 longSteps = [
   function() {
     console.log(' - Initial Render.');
-    page.render(PNGDIR + CALDATE +'page1.png');
+    //page.render(PNGDIR + CALDATE +'page1.png');
   },
   function() {
     console.log(' - Changing Date.');
@@ -149,7 +149,7 @@ longSteps = [
   },
   function() {
     console.log(' - Second Render.');
-    page.render(PNGDIR + CALDATE + 'page2.png');
+    //page.render(PNGDIR + CALDATE + 'page2.png');
   },
   function() {
     console.log(' - Loading Schedule.');
@@ -164,7 +164,7 @@ longSteps = [
   },
   function() {
     console.log(' - Third Render.');
-    page.render(PNGDIR + CALDATE +'page3.png');
+    //page.render(PNGDIR + CALDATE +'page3.png');
   },
   function() {
     console.log(' - Filtering by name.');
@@ -180,7 +180,7 @@ longSteps = [
   },
   function() {
     console.log(' - Fourth Render.');
-    page.render(PNGDIR + CALDATE + 'page4.png');
+    //page.render(PNGDIR + CALDATE + 'page4.png');
     // This is for debug/testing/backup purposes
     // fs.write('./dump.html',page.content,'w');
     // Extract the Schedule
