@@ -205,7 +205,7 @@ while : ; do
 ###########################
 ## Only download frontpage if its going to get posted somewhere.
 if [ "$GOOGLEDRIVEDIR" ]; then
-  if [ -f "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf ] && [ $FORCE == false ]
+  if [ -f "$NAME"/"$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf ] && [ $FORCE == false ]
   then
     echo '++ Front page already downloaded.'
     GOTFP=true
@@ -217,14 +217,14 @@ if [ "$GOOGLEDRIVEDIR" ]; then
 
     URL=http://www.cnatra.navy.mil/scheds/"$TRAWING"/SQ-"$SQUADRON"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf
 
-    curl -s -S --create-dirs --fail -o "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$URL"
+    curl -s -S --create-dirs --fail -o "$NAME"/"$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$URL"
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded front page."
        if [ "$GOOGLEDRIVEDIR" ]; then
          echo "++ Copying to google drive for sharing"
          if [ ! "$SUPPRESSGD" == false ]; then
-           cp "$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$GOOGLEDRIVEDIR""$FPDIR"
+           cp "$NAME"/"$FPDIR"/\$"$DATESTR"\$"$SQUADRON"\$Frontpage.pdf "$GOOGLEDRIVEDIR""$FPDIR"
          fi
        fi
        if [ "$PHONENUM" ]; then
@@ -248,7 +248,7 @@ fi
 #########################
 ### DOWNLOAD SCHEDULE ###
 #########################
-  if [  -f ./PNGs/"$CALDATE"\page3.png  -a  -f ./PNGs/"$CALDATE"\page4.png ] && [ $FORCE == false ]; then
+  if [  -f ./"$NAME"/"$PNGDIR"/"$CALDATE"\page3.png  -a  -f ./"$NAME"/"$PNGDIR"/"$CALDATE"\page4.png ] && [ $FORCE == false ]; then
     echo "++ Schedule already downloaded."
     GOTSKED=true
   else
@@ -264,13 +264,13 @@ fi
        if [ "$GOOGLEDRIVEDIR" ]; then
          echo "++ Copying to google drive for sharing"
          if [ ! "$SUPPRESSGD" == false ]; then
-           cp "$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
+           cp "$NAME"/"$PNGDIR"/"$CALDATE"page{3,4}.png "$GOOGLEDRIVEDIR""$PNGDIR"
          fi
        fi
        if [ "$PHONENUM" ]; then
          echo "++ Sending SMS notification."
          if [ "$SUPPRESSSMS" == false ]; then
-           curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$(date +%Y-%m-%d) // $(cat schedule)'"
+           curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$(date +%Y-%m-%d) // $(cat "$NAME"/schedule_"$NAME")'"
          fi
        fi
     else

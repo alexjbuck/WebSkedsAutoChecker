@@ -129,7 +129,7 @@ shortSteps = [
       return schedule
     });
     // console.log(schedule);
-    fs.write('schedule',schedule,'w');
+    fs.write(NAME+'/schedule_'+NAME,schedule,'w');
   }
 ]
 
@@ -215,7 +215,7 @@ longSteps = [
       return schedule
     });
     // console.log(schedule);
-    fs.write('schedule',schedule,'w');
+    fs.write(NAME+'/schedule',schedule,'w');
   }
 ]
 
