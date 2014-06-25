@@ -257,7 +257,7 @@ fi
     echo '** Downloading schedule.'
     echo '**'
 
-    phantomjs singleCheck.js $JULIAN $NAME
+    phantomjs singleCheck.js --julian $JULIAN --name $NAME --squadron $SQUADRON --pngdir $PNGDIR
 
     if [ $? -eq 0 ];then
        echo "++ Successfully downloaded schedule."
@@ -270,7 +270,7 @@ fi
        if [ "$PHONENUM" ]; then
          echo "++ Sending SMS notification."
          if [ "$SUPPRESSSMS" == false ]; then
-           curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$(date +%Y-%m-%d) // $(cat "$NAME"/schedule)'"
+           curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$DATESTR // $(cat $NAME/schedule)'"
          fi
        fi
     else

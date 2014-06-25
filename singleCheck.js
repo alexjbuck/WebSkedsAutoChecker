@@ -11,15 +11,19 @@ var fs = require("fs");
 var sys = require("system");
 var args = sys.args;
 
-var address = 'http://www.cnatra.navy.mil/scheds/schedule_data.aspx?sq=vt-6';
+var address_template = 'http://www.cnatra.navy.mil/scheds/schedule_data.aspx?sq=';
+var address = '';
 
 var loading = true;
 var loaded = false;
 var index = 0;
-var NAME='buck';
+var NAME='';
 var CALDATE='';
+var SQUADRON='';
 var JDATE2CALDATE = 5113;
-var PNGDIR = './PNGs/';
+var PNGDIR = '/PNGs/';
+
+
 
 // IN PROGRESS
 // shift out the first input because it is the name of the calling javascript file (these are inputs relative to the 'phantomjs' call)
@@ -42,9 +46,42 @@ while(args.length>0){
   }
 }
 */
+i=1; // Index 0 is singleCheck.js
+while (i<args.length) {
+  key = args[i++];
+  switch (key) {
+    case '-j':
+    case '--julian':
+      CALDATE = String(parseInt(args[i++])+JDATE2CALDATE);
+      break;
+    case '-n':
+    case '--name':
+      NAME = String(args[i++]);
+      break;
+    case '-sq':
+    case '--squadron':
+      SQUADRON= String(args[i++]);
+      address = address_template + SQUADRON;
+      break;
+  }
+}
 
+if (NAME==''){
+  console.log('Must supply a name');
+  phantom.exit(4);
+}
+if (CALDATE==''){
+  console.log('Must supply a date');
+  phantom.exit(4);
+}
+if (SQUADRON=''){
+  console.log('Must supply a squadron');
+  phantom.exit(4);
+}
+
+/*
 if (args.length>=4) {
-  console.log('phantomjs singleCheck.js (JDATE) (NAME)');
+  console.log('phantomjs singleCheck.js (JDATE) (NAME) (SQUADRON)');
   console.log('Usage Error.');
   console.log('Too many arguments provided. 0, 1, or 2 arguments are required, the Julian Date of the requested day');
   console.log('Shutting Down...');
@@ -62,6 +99,7 @@ if (args.length>=4) {
   NAME=String(args[2]);
   // console.log('Looking up Schedule for "' + NAME + '" on Julian Date: ' + args[1] + ' (CalDate: ' + CALDATE + ')');
 };
+*/
 
 
 
@@ -69,7 +107,7 @@ if (args.length>=4) {
 shortSteps = [
   function() {
     console.log(' - Initial Render.');
-    //page.render(PNGDIR + CALDATE +'page1.png');
+    //page.render('./' + NAME + PNGDIR + CALDATE +'page1.png');
   },
   function() {
     console.log(' - Changing Date.');
@@ -94,7 +132,7 @@ shortSteps = [
   },
   function() {
     console.log(' - Render.');
-    page.render(PNGDIR + CALDATE + 'page4.png');
+    page.render('./' + NAME + PNGDIR + CALDATE + 'page4.png');
     // This is for debug/testing/backup purposes
     // fs.write('./dump.html',page.content,'w');
     // Extract the Schedule
@@ -136,7 +174,7 @@ shortSteps = [
 longSteps = [
   function() {
     console.log(' - Initial Render.');
-    //page.render(PNGDIR + CALDATE +'page1.png');
+    //page.render('./' + NAME + PNGDIR + CALDATE +'page1.png');
   },
   function() {
     console.log(' - Changing Date.');
@@ -149,7 +187,7 @@ longSteps = [
   },
   function() {
     console.log(' - Second Render.');
-    //page.render(PNGDIR + CALDATE + 'page2.png');
+    //page.render('./' + NAME + PNGDIR + CALDATE + 'page2.png');
   },
   function() {
     console.log(' - Loading Schedule.');
@@ -164,7 +202,7 @@ longSteps = [
   },
   function() {
     console.log(' - Third Render.');
-    page.render(PNGDIR + CALDATE +'page3.png');
+    page.render('./' + NAME + PNGDIR + CALDATE +'page3.png');
   },
   function() {
     console.log(' - Filtering by name.');
@@ -180,7 +218,7 @@ longSteps = [
   },
   function() {
     console.log(' - Fourth Render.');
-    page.render(PNGDIR + CALDATE + 'page4.png');
+    page.render('./' + NAME + PNGDIR + CALDATE + 'page4.png');
     // This is for debug/testing/backup purposes
     // fs.write('./dump.html',page.content,'w');
     // Extract the Schedule
