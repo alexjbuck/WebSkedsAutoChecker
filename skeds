@@ -317,13 +317,13 @@ done
 timestamp() {
   if [ $# -gt 0 ]; then
     # command line input mode
-    echo $(date +'[%Y-%m-%m] %H:%M:%S >>') "$*"
+    echo $(date +'[%Y-%m-%d] %H:%M:%S >>') "$*"
   else
     # pipe mode
     while :
     do
       if read -t 1 input ; then
-        echo $(date +'[%Y-%m-%m] %H:%M:%S >>') "$input"
+        echo $(date +'[%Y-%m-%d] %H:%M:%S >>') "$input"
       fi
     done
   fi
