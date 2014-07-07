@@ -8,5 +8,5 @@ pkill sleep
 
 # Now restart all config files
 for i in config_*; do
-  skeds -c $i
+  ./skeds -c $i
 done
