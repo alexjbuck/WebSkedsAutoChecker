@@ -27,6 +27,7 @@ SUPPRESSGD=false
 declare -i JULIAN
 declare -i CALDATE
 declare -i JDATE2CALDATE
+declare -i CALDATEminusONE
 JDATE2CALDATE=5113
 
 B='\033[1m'
@@ -198,7 +199,16 @@ while : ; do
   # Conversion: 5245 == Julian Date 132 (May 12th, 2014)
   # (I believe January 1st, 2000 is CALDATE 1)
   CALDATE=JULIAN+5113
+  CALDATEminusONE=CALDATE-1
   echo "** Searching for Front Page and/or Schedule for $DATESTR"
+
+  ## Check the PNGDIR for old files (not today nor yesterday's schedule)
+  for i in $NAME/$PNGDIR/*; do
+    if [[ "$i" != ""$NAME"/"$PNGDIR"/"$CALDATE"page4.png" && "$i" != ""$NAME"/"$PNGDIR"/"$CALDATE"page3.png" && "$i" != ""$NAME"/"$PNGDIR"/"$CALDATEminusONE"page4.png" && "$i" != ""$NAME"/"$PNGDIR"/"$CALDATEminusONE"page3.png" ]]; then
+      rm $i
+    fi
+  done
+
 
 ###########################
 ### DOWNLOAD FRONT PAGE ###
@@ -285,7 +295,7 @@ fi
     # We have both FP/Sked for tomorrow, sleep until tomorrow start time
     SLEEPUNTILTIME=$(date -d ""$POLLSTART"00 tomorrow")
     SLEEPUNTILTIMESEC=$(date -d ""$POLLSTART"00 tomorrow" +%s)
-  elif [[ "$GOTSKED" == false || "$GOTFP" == false ]] && [[ "$DATESTR" != $(date +%Y-%m-%d) || $(date +%H)<"$POLLUNTIL" ]]; then
+  elif [[ "$GOTSKED" == false || "$GOTFP" == false ]] && [[ "$DATESTR" != $(date +%Y-%m-%d) || $(date +%H) -lt "$POLLUNTIL" ]]; then
     # We don't have both, and its either not yet tomorrow, or tomorrow before stop time, sleep 60 seconds
     SLEEPUNTILTIME=$(date -d ""$SLEEPTIME" seconds")
     SLEEPUNTILTIMESEC=$(date -d ""$SLEEPTIME" seconds" +%s)
