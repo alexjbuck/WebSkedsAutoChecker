@@ -240,7 +240,7 @@ if [ "$GOOGLEDRIVEDIR" ]; then
        if [ "$PHONENUM" ]; then
          echo "++ Sending SMS notification."
          if [ "$SUPPRESSSMS" == false ]; then
-           curl http://textbelt.com/text -d number="$PHONENUM" -d message="Front page for $DATESTR now on Google Drive."
+          #  curl http://textbelt.com/text -d number="$PHONENUM" -d message="Front page for $DATESTR now on Google Drive."
          fi
        fi
     else
