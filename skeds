@@ -20,7 +20,7 @@ fi
 FORCE=false
 SILENT=false
 GOTSKED=false
-GOTFP=false
+GOTFP=true
 SUPPRESSSMS=false
 SUPPRESSGD=false
 
