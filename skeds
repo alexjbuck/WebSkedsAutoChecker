@@ -205,7 +205,7 @@ while : ; do
   ## Check the PNGDIR for old files (not today nor yesterday's schedule)
   for i in $NAME/$PNGDIR/*; do
     if [[ "$i" != ""$NAME"/"$PNGDIR"/"$CALDATE"page4.png" && "$i" != ""$NAME"/"$PNGDIR"/"$CALDATE"page3.png" && "$i" != ""$NAME"/"$PNGDIR"/"$CALDATEminusONE"page4.png" && "$i" != ""$NAME"/"$PNGDIR"/"$CALDATEminusONE"page3.png" ]]; then
-      rm $i
+      rm -f $i
     fi
   done
 
