@@ -2,9 +2,9 @@
 # Relaunch all
 #
 # First kill all existing processes
-pkill skeds
-pkill phantomjs
-pkill sleep
+pkill -1 -u pi skeds
+pkill -1 -u pi phantomjs
+pkill -1 -u pi sleep
 
 # Now restart all config files
 for i in config_*; do
