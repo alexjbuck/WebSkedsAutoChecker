@@ -121,7 +121,7 @@ shortSteps = [
   function() {
     console.log(' - Filtering by name.');
     page.evaluate( function(NAME) {
-      document.getElementById('txtNameSearch').value = NAME;
+      document.getElementById('txtNameSearch').value = 'NAME'+',';
       document.forms[0].__EVENTTARGET.value='btnFilter';
       document.forms[0].__EVENTARGUMENT.value='';
       document.forms[0].submit();
