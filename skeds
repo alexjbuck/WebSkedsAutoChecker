@@ -281,7 +281,11 @@ fi
        if [ "$PHONENUM" ]; then
          echo "++ Sending SMS notification."
          if [ "$SUPPRESSSMS" == false ]; then
-           curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$DATESTR // $(cat $NAME/schedule)'"
+           ## 160 character limit. 146 after the date-string (14 chars)
+           ## Use $(wc -m < schedule) to find how many characters are in schedule (should also be the filesize)
+           ## Then use combination of head and tail to get the first 146 characters, then the next 146, etc
+           ## Loop until complete
+           curl http://textbelt.com/text -d number="$PHONENUM" -d message="'$DATESTR //$(cat $NAME/schedule)'"
          fi
        fi
     else
